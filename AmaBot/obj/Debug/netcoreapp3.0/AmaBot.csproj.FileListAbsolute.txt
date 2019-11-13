@@ -1,0 +1,14 @@
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\AmaBot.exe
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\obj\Debug\netcoreapp3.0\AmaBot.csprojAssemblyReference.cache
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\obj\Debug\netcoreapp3.0\AmaBot.AssemblyInfoInputs.cache
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\obj\Debug\netcoreapp3.0\AmaBot.AssemblyInfo.cs
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\AmaBot.deps.json
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\AmaBot.runtimeconfig.json
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\AmaBot.runtimeconfig.dev.json
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\AmaBot.dll
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\AmaBot.pdb
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\HtmlAgilityPack.dll
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\System.Xml.XPath.XmlDocument.dll
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\obj\Debug\netcoreapp3.0\AmaBot.csproj.CopyComplete
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\obj\Debug\netcoreapp3.0\AmaBot.dll
+C:\Users\edocr\Desktop\C#\AmaBot\AmaBot\obj\Debug\netcoreapp3.0\AmaBot.pdb
