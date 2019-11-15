@@ -10,74 +10,71 @@ namespace AmaBot
 {
 	class UtilWebRequest
 	{
-		//The cookies will be here.
-		private static CookieContainer _cookies = new CookieContainer();
-
-		//In case you need to clear the cookies
-		public void ClearCookies()
+		private static CookieContainer sessionCookies = new CookieContainer();
+		public static string Get(string uri)
 		{
-			_cookies = new CookieContainer();
-		}
+			HttpWebRequest webReq = (HttpWebRequest)HttpWebRequest.Create(uri);
 
-		public static string Get(string url)
-		{
+			webReq.CookieContainer = sessionCookies;
+			webReq.Method = "GET";
+			webReq.AllowAutoRedirect = true;
+			webReq.UseDefaultCredentials = true;
+			webReq.PreAuthenticate = true;
 
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-			request.Method = "GET";
-			request.Timeout = 6000; //60 second timeout
-			request.UserAgent = "Mozilla/5.0 (compatible; MSIE 9.0; Windows Phone OS 7.5; Trident/5.0; IEMobile/9.0)";
+			string responseFromServer;
 
-			//Set more parameters here...
-			//...
-
-			//This is the important part.
-			request.CookieContainer = _cookies;
-
-			HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-			var stream = response.GetResponseStream();
-
-			//When you get the response from the website, the cookies will be stored
-			//automatically in "_cookies".
-
-			using (var reader = new StreamReader(stream))
+			using (WebResponse response = webReq.GetResponse())
 			{
-				string html = reader.ReadToEnd();
-
-				return html;
-			}
-		}
-		protected static void AppendParameter(StringBuilder sb, string name, string value)
-		{
-			string encodedValue = HttpUtility.UrlEncode(value);
-			sb.AppendFormat("{0}={1}&", name, encodedValue);
-		}
-
-		public static string Post(Dictionary<string, string> dict, string requestUrl)
-		{
-			StringBuilder sb = new StringBuilder();
-			foreach(KeyValuePair<string,string> kvp in dict)
-			{
-			AppendParameter(sb,kvp.Key, kvp.Value);
+				using (Stream stream = response.GetResponseStream())
+				{
+					StreamReader reader = new StreamReader(stream);
+					responseFromServer = reader.ReadToEnd();
+				}
 			}
 
-			byte[] byteArray = Encoding.UTF8.GetBytes(sb.ToString());
+			sessionCookies = webReq.CookieContainer;
 
-			string url = requestUrl;
 
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-			request.Method = "POST";
-			request.ContentType = "application/x-www-form-urlencoded";
-			//request.Credentials = CredentialCache.DefaultNetworkCredentials; // ??
+			return responseFromServer;
+		}
 
-			using (Stream requestStream = request.GetRequestStream())
+		public static bool GetFileDownload(string uri, string pfad)
+		{
+			HttpWebRequest webReq = (HttpWebRequest)HttpWebRequest.Create(uri);
+
+			webReq.CookieContainer = sessionCookies;
+			webReq.Method = "GET";
+			webReq.AllowAutoRedirect = true;
+			webReq.UseDefaultCredentials = true;
+			webReq.PreAuthenticate = true;
+
+			// if the URI doesn't exist, an exception will be thrown here...
+			using (HttpWebResponse httpResponse = (HttpWebResponse)webReq.GetResponse())
 			{
-				requestStream.Write(byteArray, 0, byteArray.Length);
+				using (Stream responseStream = httpResponse.GetResponseStream())
+				{
+					using (FileStream localFileStream =
+						new FileStream(pfad, FileMode.Create))
+					{
+						var buffer = new byte[4096];
+						long totalBytesRead = 0;
+						int bytesRead;
+
+						while ((bytesRead = responseStream.Read(buffer, 0, buffer.Length)) > 0)
+						{
+							totalBytesRead += bytesRead;
+							localFileStream.Write(buffer, 0, bytesRead);
+						}
+					}
+				}
 			}
 
-			string response = request.GetResponse().ToString();
+			sessionCookies = webReq.CookieContainer;
 
-			return response;
+			return true;
 		}
+
+
 
 	}
 }
