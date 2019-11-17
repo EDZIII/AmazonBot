@@ -1279,7 +1279,7 @@
       ]
     },
     "runtime.rhel.7-x64.runtime.native.System.Security.Cryptography.OpenSsl/4.3.0": {
-      "sha512": "nyFNiCk/r+VOiIqreLix8yN+q3Wga9+SE8BCgkf+2BwEKiNx6DyvFjCgkfV743/grxv8jHJ8gUK4XEQw7yzRYg==",
+      "sha512": "T5NvFgmHX0WH4c7lP72krsnk+IJI10vJf2j2twGE+5QBRA4RyRAgD+ZjEgdmpLOjW4B+nZGaadewTCUcR899OQ==",
       "type": "package",
       "path": "runtime.rhel.7-x64.runtime.native.system.security.cryptography.openssl/4.3.0",
       "files": [
@@ -3553,11 +3553,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\edocr\\Desktop\\GIT Projects\\AmaBot\\AmaBot\\AmaBot.csproj",
+      "projectUniqueName": "C:\\Users\\edocr\\Desktop\\Git\\AmaBot\\AmaBot\\AmaBot\\AmaBot.csproj",
       "projectName": "AmaBot",
-      "projectPath": "C:\\Users\\edocr\\Desktop\\GIT Projects\\AmaBot\\AmaBot\\AmaBot.csproj",
+      "projectPath": "C:\\Users\\edocr\\Desktop\\Git\\AmaBot\\AmaBot\\AmaBot\\AmaBot.csproj",
       "packagesPath": "C:\\Users\\edocr\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\edocr\\Desktop\\GIT Projects\\AmaBot\\AmaBot\\obj\\",
+      "outputPath": "C:\\Users\\edocr\\Desktop\\Git\\AmaBot\\AmaBot\\AmaBot\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\",

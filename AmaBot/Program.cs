@@ -8,6 +8,8 @@ using Newtonsoft;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using CsvHelper;
+using System.Threading;
+using System.Net;
 
 namespace AmaBot
 {
@@ -30,15 +32,16 @@ namespace AmaBot
 				{
 					case "laptops":
 						Console.WriteLine("Gathering laptops from amazon...");
-						jsonPath = @"C:\Users\edocr\Desktop\GIT Projects\AmaBot\AmaBot\Products\laptops.json";
+						jsonPath = @"C:\Users\edocr\Desktop\Git\AmaBot\AmaBot\AmaBot\laptops.json";
 						break;
 					case "pcKomponente":
 						Console.WriteLine("Gathering PC components from amazon...");
-						jsonPath = @"C:\Users\edocr\Desktop\GIT Projects\AmaBot\AmaBot\Products\pckomponente.json";
+						jsonPath = @"C:\Users\edocr\Desktop\Git\AmaBot\AmaBot\AmaBot\pckomponente.json";
 						break;
 				}
 
-				//Seite1 wird geladen			
+				//Seite1 wird geladen		
+				WebProxy proxy = new WebProxy("188.138.250.83", 59538);
 				string response = UtilWebRequest.Get(x.Value);
 
 				Stopwatch sw = new Stopwatch();
@@ -71,7 +74,7 @@ namespace AmaBot
 				string linkToPgTwo = htmlDoc.DocumentNode.SelectSingleNode("//a[@class='pagnNext']").GetAttributeValue("href", "");
 				response = UtilWebRequest.Get("https://www.amazon.de" + linkToPgTwo);
 				int counter = 0;
-				int maxPageRange = 399;
+				int maxPageRange = 200;
 				while (counter < maxPageRange)
 				{
 					htmlDoc.LoadHtml(response);
@@ -81,31 +84,32 @@ namespace AmaBot
 					string productPreis = "";
 					string productHref = "";
 					string productAsin = "";
-					foreach (var n in productsContainers)
+
+					foreach (var prodCont in productsContainers)
 					{
-						IEnumerable<HtmlNode> prodDetails = n.Descendants();
-						foreach (var m in prodDetails)
+						IEnumerable<HtmlNode> prodDetails = prodCont.Descendants();
+						foreach (var prodDet in prodDetails)
 						{
-							if (m.GetAttributeValue("class", "") == "a-size-medium a-color-base a-text-normal")
+							if (prodDet.GetAttributeValue("class", "") == "a-size-medium a-color-base a-text-normal")
 							{
-								productTitle = m.InnerText;
-								productHref = m.ParentNode.GetAttributeValue("href", "");
+								productTitle = prodDet.InnerText;
+								productHref = prodDet.ParentNode.GetAttributeValue("href", "");
 								int startPos = productHref.LastIndexOf("dp/") + "dp/".Length;
 								int length = productHref.IndexOf("/ref") - startPos;
 								productAsin = productHref.Substring(startPos, length);
 
 
 							}
-							if (m.GetAttributeValue("class", "") == "a-price-whole")
+							if (prodDet.GetAttributeValue("class", "") == "a-price-whole")
 							{
-								if (m.InnerText == "")
+								if (prodDet.InnerText == "" || prodDet.InnerText == null)
 								{
 									productPreis = "0";
 								}
 								else
 								{
-									productPreis = m.InnerText;
-									productPreis = productPreis.Replace(",", ".");
+									productPreis = prodDet.InnerText;
+
 								}
 							}
 						}
@@ -135,17 +139,22 @@ namespace AmaBot
 								};
 								komponenteList.Add(pcKomp);
 
-								//newLine = string.Format("{0}ç{1}ç{2}ç{3}ç{4}ç{5}", "PC Komponente", pcKomp.Date, pcKomp.Asin, pcKomp.Title, pcKomp.Price, pcKomp.Href);
-								//csv.AppendLine(newLine);
 								break;
 						}
-
 					}
-					string nextPage = LinkToNextPage(response);
 
+					string nextPage = LinkToNextPage(response);
 					counter++;
+
 					Console.WriteLine("Seite " + counter + " von " + maxPageRange);
-					response = UtilWebRequest.Get("https://www.amazon.de" + nextPage);
+					//zur neuen Seite
+					Random rn = new Random();
+					int sleep = rn.Next(1000, 10000);
+					//random sleep damit die Sicherheit nicht sofort merkt, dass es ein bot ist...
+					Thread.Sleep(sleep);
+					Console.WriteLine("Sleep: " + sleep);
+					response = UtilWebRequest.Get("https://www.amazon.de" + nextPage
+						);
 					if (response == "")
 					{
 						Console.WriteLine("End of the pages");
@@ -158,9 +167,8 @@ namespace AmaBot
 				{
 					case "laptops":
 						File.WriteAllText(jsonPath, "{\n\"Laptop\" : " + JsonConvert.SerializeObject(laptopList) + "\n}");
-
-
 						break;
+
 					case "pcKomponente":
 						File.WriteAllText(jsonPath, "{\n\"PcKomponente\" : " + JsonConvert.SerializeObject(komponenteList) + "\n}");
 						break;
@@ -168,7 +176,7 @@ namespace AmaBot
 
 				Console.WriteLine("Process completion time " + ElapsedTimeInMinutes(sw));
 			}
-			using (var writer = new StreamWriter(@"C:\Users\edocr\Desktop\GIT Projects\AmaBot\test.txt"))
+			using (var writer = new StreamWriter(File.Create(@"C:\Users\edocr\Desktop\Git\AmaBot\AmaBot\AmaBot\" + DateTime.Now.ToString("dd.MM.yyyy") + ".csv")))
 			using (var csv = new CsvWriter(writer))
 			{
 				csv.WriteRecords(laptopList);

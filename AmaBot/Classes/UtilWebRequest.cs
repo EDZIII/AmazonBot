@@ -20,6 +20,7 @@ namespace AmaBot
 			webReq.AllowAutoRedirect = true;
 			webReq.UseDefaultCredentials = true;
 			webReq.PreAuthenticate = true;
+			
 
 			string responseFromServer;
 

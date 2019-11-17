@@ -43,3 +43,4 @@ C:\Users\edocr\Desktop\GIT Projects\AmaBot\AmaBot\obj\Debug\netcoreapp3.0\AmaBot
 C:\Users\edocr\Desktop\GIT Projects\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\Newtonsoft.Json.dll
 C:\Users\edocr\Desktop\Git\AmaBot\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\Newtonsoft.Json.dll
 C:\Users\edocr\Desktop\GIT Projects\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\CsvHelper.dll
+C:\Users\edocr\Desktop\Git\AmaBot\AmaBot\AmaBot\bin\Debug\netcoreapp3.0\CsvHelper.dll
