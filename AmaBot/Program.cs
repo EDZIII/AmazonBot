@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using HtmlAgilityPack;
 using Newtonsoft;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using CsvHelper;
 
 namespace AmaBot
 {
@@ -17,6 +19,9 @@ namespace AmaBot
 			ProductsLink.Add(new KeyValuePair<string, string>("laptops", "https://www.amazon.de/gp/browse.html?node=427957031&ref_=nav_em_T1_0_4_17_1__desk"));
 			ProductsLink.Add(new KeyValuePair<string, string>("pcKomponente", "https://www.amazon.de/gp/browse.html?node=427956031&ref_=nav_em_T1_0_4_17_4__compc"));
 
+			List<Laptop> laptopList = null;
+			List<PcKomponente> komponenteList = null;
+
 			foreach (var x in ProductsLink)
 			{
 
@@ -25,11 +30,11 @@ namespace AmaBot
 				{
 					case "laptops":
 						Console.WriteLine("Gathering laptops from amazon...");
-						jsonPath = @"C:\Users\edocr\Desktop\Git\AmaBot\AmaBot\AmaBot\laptops.json";
+						jsonPath = @"C:\Users\edocr\Desktop\GIT Projects\AmaBot\AmaBot\Products\laptops.json";
 						break;
 					case "pcKomponente":
 						Console.WriteLine("Gathering PC components from amazon...");
-						jsonPath = @"C:\Users\edocr\Desktop\Git\AmaBot\AmaBot\AmaBot\pckomponente.json";
+						jsonPath = @"C:\Users\edocr\Desktop\GIT Projects\AmaBot\AmaBot\Products\pckomponente.json";
 						break;
 				}
 
@@ -46,8 +51,7 @@ namespace AmaBot
 					deserializedJsonString = sr.ReadToEnd();
 				}
 
-				List<Laptop> laptopList = null;
-				List<PcKomponente> komponenteList = null;
+
 				JObject productsJObjects = JsonConvert.DeserializeObject<JObject>(deserializedJsonString);
 				switch (x.Key)
 				{
@@ -67,7 +71,7 @@ namespace AmaBot
 				string linkToPgTwo = htmlDoc.DocumentNode.SelectSingleNode("//a[@class='pagnNext']").GetAttributeValue("href", "");
 				response = UtilWebRequest.Get("https://www.amazon.de" + linkToPgTwo);
 				int counter = 0;
-				int maxPageRange = 50;
+				int maxPageRange = 399;
 				while (counter < maxPageRange)
 				{
 					htmlDoc.LoadHtml(response);
@@ -76,6 +80,7 @@ namespace AmaBot
 					string productTitle = "";
 					string productPreis = "";
 					string productHref = "";
+					string productAsin = "";
 					foreach (var n in productsContainers)
 					{
 						IEnumerable<HtmlNode> prodDetails = n.Descendants();
@@ -85,16 +90,22 @@ namespace AmaBot
 							{
 								productTitle = m.InnerText;
 								productHref = m.ParentNode.GetAttributeValue("href", "");
+								int startPos = productHref.LastIndexOf("dp/") + "dp/".Length;
+								int length = productHref.IndexOf("/ref") - startPos;
+								productAsin = productHref.Substring(startPos, length);
+
+
 							}
 							if (m.GetAttributeValue("class", "") == "a-price-whole")
 							{
 								if (m.InnerText == "")
 								{
-									productPreis = "~";
+									productPreis = "0";
 								}
 								else
 								{
 									productPreis = m.InnerText;
+									productPreis = productPreis.Replace(",", ".");
 								}
 							}
 						}
@@ -103,7 +114,9 @@ namespace AmaBot
 							case "laptops":
 								Laptop laptop = new Laptop
 								{
+									Kategorie = "Laptop",
 									Date = DateTime.Now.ToString("dd.MM.yyyy"),
+									Asin = productAsin,
 									Title = productTitle,
 									Price = productPreis,
 									Href = "https://www.amazon.de" + productHref
@@ -113,12 +126,17 @@ namespace AmaBot
 							case "pcKomponente":
 								PcKomponente pcKomp = new PcKomponente
 								{
+									Kategorie = "Pc Komponente",
 									Date = DateTime.Now.ToString("dd.MM.yyyy"),
+									Asin = productAsin,
 									Title = productTitle,
 									Price = productPreis,
 									Href = "https://www.amazon.de" + productHref
 								};
 								komponenteList.Add(pcKomp);
+
+								//newLine = string.Format("{0}ç{1}ç{2}ç{3}ç{4}ç{5}", "PC Komponente", pcKomp.Date, pcKomp.Asin, pcKomp.Title, pcKomp.Price, pcKomp.Href);
+								//csv.AppendLine(newLine);
 								break;
 						}
 
@@ -140,6 +158,8 @@ namespace AmaBot
 				{
 					case "laptops":
 						File.WriteAllText(jsonPath, "{\n\"Laptop\" : " + JsonConvert.SerializeObject(laptopList) + "\n}");
+
+
 						break;
 					case "pcKomponente":
 						File.WriteAllText(jsonPath, "{\n\"PcKomponente\" : " + JsonConvert.SerializeObject(komponenteList) + "\n}");
@@ -147,6 +167,12 @@ namespace AmaBot
 				}
 
 				Console.WriteLine("Process completion time " + ElapsedTimeInMinutes(sw));
+			}
+			using (var writer = new StreamWriter(@"C:\Users\edocr\Desktop\GIT Projects\AmaBot\test.txt"))
+			using (var csv = new CsvWriter(writer))
+			{
+				csv.WriteRecords(laptopList);
+				csv.WriteRecords(komponenteList);
 			}
 
 			Console.WriteLine("End of AmaBot");
